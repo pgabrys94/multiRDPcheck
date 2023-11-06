@@ -1,9 +1,8 @@
 import subprocess
+import os
 
 
 def multiple_sessions_check():
-    file = r"C:\Windows\system32\termsrv.dll"
-    patch = "B80001000089813806000090"
 
     with open(file, "rb") as f:
         code = f.read().hex().upper()
@@ -12,8 +11,6 @@ def multiple_sessions_check():
 
 
 def send_to_zabbix(content):
-    zabbix_sender_path = "zabbix_sender.exe"
-    zabbix_agent_config = "zabbix_agent2.conf"
 
     zabbix_host = None
     pskid = None
@@ -43,4 +40,16 @@ def send_to_zabbix(content):
                     str(content), "-c", zabbix_agent_config])
 
 
-send_to_zabbix(multiple_sessions_check())
+file = r"C:\Windows\system32\termsrv.dll"
+patch = "B80001000089813806000090"
+zabbix_sender_path = "zabbix_sender.exe"
+zabbix_agent_config = "zabbix_agent2.conf"
+
+if os.path.exists(zabbix_sender_path) and os.path.exists(zabbix_agent_config):
+    if os.name == "nt":
+        send_to_zabbix(multiple_sessions_check())
+    else:
+        print("This program works only in Windows NT systems.")
+else:
+    print("Cannot found 'zabbix sender.exe' or config file.")
+    print("Those files (including this .exe) must be in the same directory.")
